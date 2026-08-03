@@ -8,6 +8,11 @@
 - Do not add Tailwind CSS, daisyUI, gluestack, another component library, or another styling system unless the user explicitly requests it.
 - Keep `@mantine/core` styles granular: import only the global foundations and the CSS files for components that are actually used. Do not import the complete `@mantine/core/styles.css` bundle.
 
+## Data fetching
+
+- Perform every server call (queries and mutations) through TanStack Query (`@tanstack/react-query`): `useQuery` for reads, `useMutation` for writes. Do not call `fetch` directly from components; keep the raw request functions in a small API module and consume them via TanStack Query hooks.
+- Client-side JWT handling never validates the signature (the secret is server-side only): decode the payload to read `exp` for UX, and treat a `401` response as the source of truth to log out and redirect to the login page.
+
 ## React and JSX
 
 - Use Mantine components or project-defined React components in application JSX.
