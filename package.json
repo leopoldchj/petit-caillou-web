@@ -12,8 +12,10 @@
   "dependencies": {
     "@mantine/core": "^9.5.1",
     "@mantine/hooks": "^9.5.1",
+    "@tanstack/react-query": "^5.101.4",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "react-router-dom": "^7.18.2"
   },
   "devDependencies": {
     "@eslint/js": "latest",

@@ -6,10 +6,12 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
-    // Serves the API under the dev server origin, so the browser only ever
-    // sees one origin and no CORS handling is needed on either side.
     proxy: {
-      '/api': 'http://localhost:8080',
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
     },
   },
 })
