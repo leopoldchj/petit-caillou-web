@@ -1,6 +1,6 @@
 export interface AuthUser
 {
-  alias: string
+  username: string
   email: string
   role: string
 }
@@ -63,7 +63,7 @@ export function readValidUser(token: string): AuthUser | null
     return null
   }
 
-  return { alias: claims.sub, email: claims.email, role: claims.role }
+  return { username: claims.sub, email: claims.email, role: claims.role }
 }
 
 export function readStoredToken(): string | null

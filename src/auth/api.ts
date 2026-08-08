@@ -2,13 +2,13 @@ const API_URL = import.meta.env.VITE_API_URL ?? '/api'
 
 export interface LoginInput
 {
-  alias: string
+  username: string
   password: string
 }
 
 export interface RegisterInput
 {
-  alias: string
+  username: string
   email: string
   password: string
 }

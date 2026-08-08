@@ -20,14 +20,14 @@ export function HomePage()
       <Container size={480} w="100%">
         <Stack>
           <Brand />
-          <Title order={1}>Welcome{user ? `, ${user.alias}` : ''}</Title>
+          <Title order={1}>Welcome{user ? `, ${user.username}` : ''}</Title>
           <Text c="dimmed">You are signed in. Here is the information read from your token.</Text>
 
           <Card withBorder radius="md" p="lg">
             <Stack gap="xs">
               <Group justify="space-between">
-                <Text fw={500}>Alias</Text>
-                <Text>{user?.alias}</Text>
+                <Text fw={500}>Username</Text>
+                <Text>{user?.username}</Text>
               </Group>
               <Group justify="space-between">
                 <Text fw={500}>Email</Text>

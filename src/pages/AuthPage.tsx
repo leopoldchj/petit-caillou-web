@@ -30,8 +30,8 @@ export function AuthPage()
   const navigate = useNavigate()
   const location = useLocation()
   const [tab, setTab] = useState<string | null>('login')
-  const [loginForm, setLoginForm] = useState<LoginInput>({ alias: '', password: '' })
-  const [registerForm, setRegisterForm] = useState<RegisterInput>({ alias: '', email: '', password: '' })
+  const [loginForm, setLoginForm] = useState<LoginInput>({ username: '', password: '' })
+  const [registerForm, setRegisterForm] = useState<RegisterInput>({ username: '', email: '', password: '' })
 
   const from = (location.state as RedirectState | null)?.from ?? '/'
 
@@ -85,12 +85,12 @@ export function AuthPage()
                   )}
 
                   <TextInput
-                    label="Alias"
+                    label="Username"
                     autoComplete="username"
-                    value={loginForm.alias}
+                    value={loginForm.username}
                     onChange={(event) =>
                     {
-                      setLoginForm({ ...loginForm, alias: event.currentTarget.value })
+                      setLoginForm({ ...loginForm, username: event.currentTarget.value })
                     }}
                     required
                   />
@@ -123,12 +123,12 @@ export function AuthPage()
                   )}
 
                   <TextInput
-                    label="Alias"
+                    label="Username"
                     autoComplete="username"
-                    value={registerForm.alias}
+                    value={registerForm.username}
                     onChange={(event) =>
                     {
-                      setRegisterForm({ ...registerForm, alias: event.currentTarget.value })
+                      setRegisterForm({ ...registerForm, username: event.currentTarget.value })
                     }}
                     required
                   />
