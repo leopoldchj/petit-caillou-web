@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { RequireAuth } from './auth/RequireAuth'
 import { AuthPage } from './pages/AuthPage'
-import { HomePage } from './pages/HomePage'
+import { DashboardPage } from './pages/DashboardPage'
 
 export function App()
 {
@@ -13,7 +13,7 @@ export function App()
         path="/"
         element={(
           <RequireAuth>
-            <HomePage />
+            <DashboardPage />
           </RequireAuth>
         )}
       />
