@@ -80,6 +80,13 @@ function ApplicationForm({ application, onClose }: { application: JobApplication
   const pending = createApplication.isPending || updateApplication.isPending
   const error = createApplication.error ?? updateApplication.error
 
+  const setField = (field: 'title' | 'link' | 'location' | 'applicationDate' | 'description') =>
+    (event: { currentTarget: { value: string } }) =>
+    {
+      const value = event.currentTarget.value
+      setForm((current) => ({ ...current, [field]: value }))
+    }
+
   const submit = (event: SyntheticEvent) =>
   {
     event.preventDefault()
@@ -127,45 +134,13 @@ function ApplicationForm({ application, onClose }: { application: JobApplication
           error={companyError ?? undefined}
         />
 
-        <TextInput
-          label="Title"
-          required
-          value={form.title}
-          onChange={(event) =>
-          {
-            setForm((current) => ({ ...current, title: event.currentTarget.value }))
-          }}
-        />
+        <TextInput label="Title" required value={form.title} onChange={setField('title')} />
 
-        <TextInput
-          label="Offer link"
-          placeholder="https://…"
-          value={form.link}
-          onChange={(event) =>
-          {
-            setForm((current) => ({ ...current, link: event.currentTarget.value }))
-          }}
-        />
+        <TextInput label="Offer link" placeholder="https://…" value={form.link} onChange={setField('link')} />
 
-        <TextInput
-          label="Location"
-          placeholder="City, remote, …"
-          value={form.location}
-          onChange={(event) =>
-          {
-            setForm((current) => ({ ...current, location: event.currentTarget.value }))
-          }}
-        />
+        <TextInput label="Location" placeholder="City, remote, …" value={form.location} onChange={setField('location')} />
 
-        <TextInput
-          label="Application date"
-          type="date"
-          value={form.applicationDate}
-          onChange={(event) =>
-          {
-            setForm((current) => ({ ...current, applicationDate: event.currentTarget.value }))
-          }}
-        />
+        <TextInput label="Application date" type="date" value={form.applicationDate} onChange={setField('applicationDate')} />
 
         <Select
           label="Status"
@@ -181,16 +156,7 @@ function ApplicationForm({ application, onClose }: { application: JobApplication
           }}
         />
 
-        <Textarea
-          label="Notes"
-          autosize
-          minRows={2}
-          value={form.description}
-          onChange={(event) =>
-          {
-            setForm((current) => ({ ...current, description: event.currentTarget.value }))
-          }}
-        />
+        <Textarea label="Notes" autosize minRows={2} value={form.description} onChange={setField('description')} />
 
         <Group justify="flex-end">
           <Button variant="default" type="button" onClick={onClose}>Cancel</Button>
