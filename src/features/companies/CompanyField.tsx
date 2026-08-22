@@ -1,9 +1,10 @@
 import { useState } from 'react'
 
-import { Alert, Anchor, Button, Group, Paper, Select, Stack, TextInput } from '@mantine/core'
+import { Alert, Button, Group, Paper, Select, Stack, TextInput } from '@mantine/core'
 
 import { useCompanies, useCreateCompany } from '../../api/companies'
 import { existingCompanyId } from '../../api/http'
+import { PlusIcon } from '../../components/icons'
 
 interface CompanyFieldProps
 {
@@ -110,13 +111,19 @@ export function CompanyField({ value, onChange, error }: CompanyFieldProps)
           </Paper>
         )
         : (
-          <Anchor component="button" type="button" size="sm" onClick={() =>
-          {
-            setCreating(true)
-          }}
-          >
-            + Create a new company
-          </Anchor>
+          <Group>
+            <Button
+              variant="subtle"
+              size="compact-sm"
+              leftSection={<PlusIcon size={14} />}
+              onClick={() =>
+              {
+                setCreating(true)
+              }}
+            >
+              Create a new company
+            </Button>
+          </Group>
         )}
     </Stack>
   )

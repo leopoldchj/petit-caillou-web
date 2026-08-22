@@ -1,4 +1,4 @@
-import { Box, Button, Container, Group, Tabs, Text } from '@mantine/core'
+import { Box, Button, Container, Divider, Group, Tabs, Text } from '@mantine/core'
 import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../auth/authContext'
@@ -29,9 +29,10 @@ export function DashboardPage()
             </Group>
           </Group>
         </Container>
+        <Divider />
       </Box>
 
-      <Container size="lg" pb="xl">
+      <Container size="lg" pt="lg" pb="xl">
         <Tabs defaultValue="applications" keepMounted={false}>
           <Tabs.List mb="lg">
             <Tabs.Tab value="applications">Applications</Tabs.Tab>

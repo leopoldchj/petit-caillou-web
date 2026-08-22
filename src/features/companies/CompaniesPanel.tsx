@@ -1,9 +1,10 @@
 import { useState, type SyntheticEvent } from 'react'
 
-import { Alert, Anchor, Box, Button, Center, Group, Loader, Modal, Paper, Stack, Table, Text, TextInput, Title } from '@mantine/core'
+import { ActionIcon, Alert, Anchor, Box, Button, Center, Group, Modal, Paper, Skeleton, Stack, Table, Text, TextInput, Title, Tooltip } from '@mantine/core'
 
 import { useCompanies, useCreateCompany, useDeleteCompany, useUpdateCompany } from '../../api/companies'
 import type { Company } from '../../api/types'
+import { PencilIcon, PlusIcon, TrashIcon } from '../../components/icons'
 
 export function CompaniesPanel()
 {
@@ -34,10 +35,10 @@ export function CompaniesPanel()
 
   return (
     <Stack>
-      <Paper withBorder p="md" radius="sm">
+      <Paper withBorder p="md" radius="md">
         <Box component="form" onSubmit={submitCreate}>
           <Stack gap="sm">
-            <Title order={4}>Add a company</Title>
+            <Title order={5}>Add a company</Title>
 
             {createCompany.error !== null && (
               <Alert color="red" variant="light">{createCompany.error.message}</Alert>
@@ -64,7 +65,14 @@ export function CompaniesPanel()
                 }}
                 w={260}
               />
-              <Button type="submit" loading={createCompany.isPending} disabled={name.trim() === ''}>Add</Button>
+              <Button
+                type="submit"
+                leftSection={<PlusIcon />}
+                loading={createCompany.isPending}
+                disabled={name.trim() === ''}
+              >
+                Add
+              </Button>
             </Group>
           </Stack>
         </Box>
@@ -76,7 +84,9 @@ export function CompaniesPanel()
 
       {companiesQuery.isPending
         ? (
-          <Center py="xl"><Loader /></Center>
+          <Stack gap="xs">
+            {[0, 1, 2].map((row) => <Skeleton key={row} height={44} radius="sm" />)}
+          </Stack>
         )
         : companiesQuery.error !== null
           ? (
@@ -84,44 +94,55 @@ export function CompaniesPanel()
           )
           : companies.length === 0
             ? (
-              <Center py="xl"><Text c="dimmed">No company yet.</Text></Center>
+              <Center py={48}><Text c="dimmed">No company yet.</Text></Center>
             )
             : (
-              <Table striped highlightOnHover verticalSpacing="sm">
+              <Table striped highlightOnHover verticalSpacing="sm" horizontalSpacing="md">
                 <Table.Thead>
                   <Table.Tr>
                     <Table.Th>Name</Table.Th>
                     <Table.Th>Website</Table.Th>
-                    <Table.Th />
+                    <Table.Th w={96} />
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
                   {companies.map((company) => (
                     <Table.Tr key={company.id}>
-                      <Table.Td>{company.name}</Table.Td>
+                      <Table.Td fw={500}>{company.name}</Table.Td>
                       <Table.Td>
                         {company.website === null
                           ? <Text c="dimmed">—</Text>
                           : <Anchor href={company.website} target="_blank" rel="noreferrer">{company.website}</Anchor>}
                       </Table.Td>
                       <Table.Td>
-                        <Group gap="xs" justify="flex-end" wrap="nowrap">
-                          <Button size="xs" variant="subtle" onClick={() =>
-                          {
-                            setEditing(company)
-                          }}
-                          >Edit</Button>
-                          <Button
-                            size="xs"
-                            variant="subtle"
-                            color="red"
-                            onClick={() =>
-                            {
-                              deleteCompany.mutate(company.id)
-                            }}
-                          >
-                            Delete
-                          </Button>
+                        <Group gap={2} justify="flex-end" wrap="nowrap">
+                          <Tooltip label="Edit" withArrow>
+                            <ActionIcon
+                              variant="subtle"
+                              color="gray"
+                              aria-label="Edit company"
+                              onClick={() =>
+                              {
+                                setEditing(company)
+                              }}
+                            >
+                              <PencilIcon />
+                            </ActionIcon>
+                          </Tooltip>
+                          <Tooltip label="Delete" withArrow>
+                            <ActionIcon
+                              variant="subtle"
+                              color="red"
+                              aria-label="Delete company"
+                              loading={deleteCompany.isPending && deleteCompany.variables === company.id}
+                              onClick={() =>
+                              {
+                                deleteCompany.mutate(company.id)
+                              }}
+                            >
+                              <TrashIcon />
+                            </ActionIcon>
+                          </Tooltip>
                         </Group>
                       </Table.Td>
                     </Table.Tr>
@@ -135,13 +156,11 @@ export function CompaniesPanel()
         setEditing(null)
       }} title="Edit company" centered
       >
-        {editing !== null && (
-          <EditCompanyForm company={editing} onClose={() =>
-          {
-            setEditing(null)
-          }}
-          />
-        )}
+        {editing !== null && <EditCompanyForm company={editing} onClose={() =>
+        {
+          setEditing(null)
+        }}
+        />}
       </Modal>
     </Stack>
   )

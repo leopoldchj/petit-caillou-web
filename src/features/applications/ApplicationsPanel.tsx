@@ -1,10 +1,11 @@
 import { useState } from 'react'
 
-import { Alert, Anchor, Box, Button, Center, Group, Loader, Select, Table, Text } from '@mantine/core'
+import { ActionIcon, Alert, Anchor, Box, Button, Center, Group, Select, Skeleton, Stack, Table, Text, Tooltip } from '@mantine/core'
 
 import { useApplications, useDeleteApplication } from '../../api/applications'
 import { useCompanies } from '../../api/companies'
 import type { JobApplication } from '../../api/types'
+import { ExternalLinkIcon, PencilIcon, PlusIcon, TrashIcon } from '../../components/icons'
 import { ApplicationFormModal } from './ApplicationFormModal'
 import { StatusBadge } from './StatusBadge'
 
@@ -36,7 +37,7 @@ export function ApplicationsPanel()
 
   return (
     <Box>
-      <Group justify="space-between" mb="md">
+      <Group justify="space-between" mb="lg">
         <Select
           placeholder="All companies"
           data={companyOptions}
@@ -46,7 +47,7 @@ export function ApplicationsPanel()
           clearable
           w={260}
         />
-        <Button onClick={openNew}>New application</Button>
+        <Button onClick={openNew} leftSection={<PlusIcon />}>New application</Button>
       </Group>
 
       {deleteApplication.error !== null && (
@@ -55,7 +56,9 @@ export function ApplicationsPanel()
 
       {applicationsQuery.isPending
         ? (
-          <Center py="xl"><Loader /></Center>
+          <Stack gap="xs">
+            {[0, 1, 2, 3].map((row) => <Skeleton key={row} height={48} radius="sm" />)}
+          </Stack>
         )
         : applicationsQuery.error !== null
           ? (
@@ -63,11 +66,17 @@ export function ApplicationsPanel()
           )
           : applications.length === 0
             ? (
-              <Center py="xl"><Text c="dimmed">No application yet. Add your first one.</Text></Center>
+              <Center py={64}>
+                <Stack align="center" gap="xs">
+                  <Text fw={600}>No application yet</Text>
+                  <Text c="dimmed" size="sm">Track your first job application to get started.</Text>
+                  <Button mt="sm" onClick={openNew} leftSection={<PlusIcon />}>New application</Button>
+                </Stack>
+              </Center>
             )
             : (
               <Table.ScrollContainer minWidth={720}>
-                <Table striped highlightOnHover verticalSpacing="sm">
+                <Table striped highlightOnHover verticalSpacing="sm" horizontalSpacing="md">
                   <Table.Thead>
                     <Table.Tr>
                       <Table.Th>Title</Table.Th>
@@ -76,13 +85,13 @@ export function ApplicationsPanel()
                       <Table.Th>Status</Table.Th>
                       <Table.Th>Date</Table.Th>
                       <Table.Th>Offer</Table.Th>
-                      <Table.Th />
+                      <Table.Th w={96} />
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody>
                     {applications.map((application) => (
                       <Table.Tr key={application.id}>
-                        <Table.Td>{application.title}</Table.Td>
+                        <Table.Td fw={500}>{application.title}</Table.Td>
                         <Table.Td>
                           {application.company.website === null
                             ? <Text>{application.company.name}</Text>
@@ -92,32 +101,47 @@ export function ApplicationsPanel()
                               </Anchor>
                             )}
                         </Table.Td>
-                        <Table.Td>{application.location ?? '—'}</Table.Td>
+                        <Table.Td>{application.location ?? <Text c="dimmed">—</Text>}</Table.Td>
                         <Table.Td><StatusBadge status={application.responseStatus} /></Table.Td>
-                        <Table.Td>{application.applicationDate ?? '—'}</Table.Td>
+                        <Table.Td>{application.applicationDate ?? <Text c="dimmed">—</Text>}</Table.Td>
                         <Table.Td>
                           {application.link === null
                             ? <Text c="dimmed">—</Text>
-                            : <Anchor href={application.link} target="_blank" rel="noreferrer">Offer</Anchor>}
+                            : (
+                              <Anchor href={application.link} target="_blank" rel="noreferrer">
+                                <Group gap={4} wrap="nowrap" align="center">Open<ExternalLinkIcon /></Group>
+                              </Anchor>
+                            )}
                         </Table.Td>
                         <Table.Td>
-                          <Group gap="xs" justify="flex-end" wrap="nowrap">
-                            <Button size="xs" variant="subtle" onClick={() =>
-                            {
-                              openEdit(application)
-                            }}
-                            >Edit</Button>
-                            <Button
-                              size="xs"
-                              variant="subtle"
-                              color="red"
-                              onClick={() =>
-                              {
-                                deleteApplication.mutate(application.id)
-                              }}
-                            >
-                              Delete
-                            </Button>
+                          <Group gap={2} justify="flex-end" wrap="nowrap">
+                            <Tooltip label="Edit" withArrow>
+                              <ActionIcon
+                                variant="subtle"
+                                color="gray"
+                                aria-label="Edit application"
+                                onClick={() =>
+                                {
+                                  openEdit(application)
+                                }}
+                              >
+                                <PencilIcon />
+                              </ActionIcon>
+                            </Tooltip>
+                            <Tooltip label="Delete" withArrow>
+                              <ActionIcon
+                                variant="subtle"
+                                color="red"
+                                aria-label="Delete application"
+                                loading={deleteApplication.isPending && deleteApplication.variables === application.id}
+                                onClick={() =>
+                                {
+                                  deleteApplication.mutate(application.id)
+                                }}
+                              >
+                                <TrashIcon />
+                              </ActionIcon>
+                            </Tooltip>
                           </Group>
                         </Table.Td>
                       </Table.Tr>
