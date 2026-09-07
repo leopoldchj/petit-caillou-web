@@ -1,6 +1,7 @@
 import { useState, type SyntheticEvent } from 'react'
+import { useDebouncedValue } from '@mantine/hooks'
 
-import { ActionIcon, Alert, Anchor, Box, Button, Center, Group, Modal, Paper, Skeleton, Stack, Table, Text, TextInput, Title, Tooltip } from '@mantine/core'
+import { ActionIcon, Alert, Anchor, Box, Button, Center, Group, Modal, Pagination, Paper, Skeleton, Stack, Table, Text, TextInput, Title, Tooltip } from '@mantine/core'
 
 import { useCompanies, useCreateCompany, useDeleteCompany, useUpdateCompany } from '../../api/companies'
 import type { Company } from '../../api/types'
@@ -8,7 +9,10 @@ import { PencilIcon, PlusIcon, TrashIcon } from '../../components/icons'
 
 export function CompaniesPanel()
 {
-  const companiesQuery = useCompanies()
+  const [search, setSearch] = useState('')
+  const [query] = useDebouncedValue(search, 250)
+  const [page, setPage] = useState(0)
+  const companiesQuery = useCompanies(query, page)
   const createCompany = useCreateCompany()
   const deleteCompany = useDeleteCompany()
 
@@ -31,7 +35,8 @@ export function CompaniesPanel()
     )
   }
 
-  const companies = companiesQuery.data ?? []
+  const companies = companiesQuery.data?.items ?? []
+  const totalPages = companiesQuery.data?.totalPages ?? 0
 
   return (
     <Stack>
@@ -81,6 +86,17 @@ export function CompaniesPanel()
       {deleteCompany.error !== null && (
         <Alert color="red" variant="light">{deleteCompany.error.message}</Alert>
       )}
+
+      <TextInput
+        label="Search companies"
+        placeholder="Start typing a company name"
+        value={search}
+        onChange={(event) =>
+        {
+          setSearch(event.currentTarget.value)
+          setPage(0)
+        }}
+      />
 
       {companiesQuery.isPending
         ? (
@@ -137,7 +153,13 @@ export function CompaniesPanel()
                               loading={deleteCompany.isPending && deleteCompany.variables === company.id}
                               onClick={() =>
                               {
-                                deleteCompany.mutate(company.id)
+                                deleteCompany.mutate(company.id, { onSuccess: () =>
+                                {
+                                  if (companies.length === 1 && page > 0)
+                                  {
+                                    setPage(page - 1)
+                                  }
+                                } })
                               }}
                             >
                               <TrashIcon />
@@ -150,6 +172,16 @@ export function CompaniesPanel()
                 </Table.Tbody>
               </Table>
             )}
+
+      {(totalPages > 1 || page > 0) && (
+        <Group justify="center">
+          <Pagination total={Math.max(totalPages, page + 1)} value={page + 1} onChange={(value) =>
+          {
+            setPage(value - 1)
+          }}
+          />
+        </Group>
+      )}
 
       <Modal opened={editing !== null} onClose={() =>
       {

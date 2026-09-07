@@ -1,9 +1,9 @@
 import { useState } from 'react'
+import { useDebouncedValue } from '@mantine/hooks'
 
 import { Alert, Button, Group, Paper, Select, Stack, TextInput } from '@mantine/core'
 
-import { useCompanies, useCreateCompany } from '../../api/companies'
-import { existingCompanyId } from '../../api/http'
+import { useCompanies, useCompany, useCreateCompany } from '../../api/companies'
 import { PlusIcon } from '../../components/icons'
 
 interface CompanyFieldProps
@@ -15,13 +15,24 @@ interface CompanyFieldProps
 
 export function CompanyField({ value, onChange, error }: CompanyFieldProps)
 {
-  const companiesQuery = useCompanies()
+  const [search, setSearch] = useState('')
+  const [query] = useDebouncedValue(search, 250)
+  const companiesQuery = useCompanies(query)
+  const selectedQuery = useCompany(value)
   const createCompany = useCreateCompany()
   const [creating, setCreating] = useState(false)
   const [name, setName] = useState('')
   const [website, setWebsite] = useState('')
 
-  const options = (companiesQuery.data ?? []).map((company) => ({ value: company.id, label: company.name }))
+  const companies = companiesQuery.data?.items ?? []
+  const selected = selectedQuery.data
+  const choices = selected && !companies.some((company) => company.id === selected.id)
+    ? [selected, ...companies]
+    : companies
+  const options = choices.map((company) => ({
+    value: company.id,
+    label: company.website ? `${company.name} · ${company.website}` : company.name,
+  }))
 
   const reset = () =>
   {
@@ -40,15 +51,6 @@ export function CompanyField({ value, onChange, error }: CompanyFieldProps)
           onChange(company.id)
           reset()
         },
-        onError: (mutationError) =>
-        {
-          const existing = existingCompanyId(mutationError)
-          if (existing !== null)
-          {
-            onChange(existing)
-            reset()
-          }
-        },
       },
     )
   }
@@ -62,8 +64,11 @@ export function CompanyField({ value, onChange, error }: CompanyFieldProps)
         value={value}
         onChange={onChange}
         searchable
-        nothingFoundMessage="No company found"
-        error={error}
+        searchValue={search}
+        onSearchChange={setSearch}
+        filter={({ options: available }) => available}
+        nothingFoundMessage={companiesQuery.isFetching ? 'Searching…' : 'No company found'}
+        error={error ?? companiesQuery.error?.message ?? selectedQuery.error?.message}
         disabled={creating}
       />
 
@@ -71,7 +76,7 @@ export function CompanyField({ value, onChange, error }: CompanyFieldProps)
         ? (
           <Paper withBorder p="sm" radius="sm">
             <Stack gap="xs">
-              {createCompany.error !== null && existingCompanyId(createCompany.error) === null && (
+              {createCompany.error !== null && (
                 <Alert color="red" variant="light">{createCompany.error.message}</Alert>
               )}
 

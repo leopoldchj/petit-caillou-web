@@ -5,6 +5,7 @@ import { useAuth } from '../auth/authContext'
 import { Brand } from '../components/Brand'
 import { ApplicationsPanel } from '../features/applications/ApplicationsPanel'
 import { CompaniesPanel } from '../features/companies/CompaniesPanel'
+import { OffersPanel } from '../features/offers/OffersPanel'
 
 export function DashboardPage()
 {
@@ -33,11 +34,16 @@ export function DashboardPage()
       </Box>
 
       <Container size="lg" pt="lg" pb="xl">
-        <Tabs defaultValue="applications" keepMounted={false}>
+        <Tabs defaultValue="offers" keepMounted={false}>
           <Tabs.List mb="lg">
+            <Tabs.Tab value="offers">Offers</Tabs.Tab>
             <Tabs.Tab value="applications">Applications</Tabs.Tab>
             <Tabs.Tab value="companies">Companies</Tabs.Tab>
           </Tabs.List>
+
+          <Tabs.Panel value="offers">
+            <OffersPanel />
+          </Tabs.Panel>
 
           <Tabs.Panel value="applications">
             <ApplicationsPanel />

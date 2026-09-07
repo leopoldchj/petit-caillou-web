@@ -1,26 +1,26 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
+import { PAGE_SIZE } from '../lib/pagination'
 import { useApiRequest } from './http'
-import type { JobApplication, JobApplicationInput } from './types'
+import type { ApplicationTrackingInput, ApplyInput, JobApplication, Page } from './types'
 
-export function useApplications(companyId: string | null)
+export function useApplications(page: number)
 {
   const request = useApiRequest()
-  const query = companyId === null ? '' : `?companyId=${encodeURIComponent(companyId)}`
 
   return useQuery({
-    queryKey: ['applications', companyId],
-    queryFn: () => request<JobApplication[]>(`/applications${query}`),
+    queryKey: ['applications', page],
+    queryFn: () => request<Page<JobApplication>>(`/applications?page=${String(page)}&size=${String(PAGE_SIZE)}`),
   })
 }
 
-export function useCreateApplication()
+export function useApplyToOffer()
 {
   const request = useApiRequest()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (input: JobApplicationInput) => request<JobApplication>('/applications', { method: 'POST', body: input }),
+    mutationFn: (input: ApplyInput) => request<JobApplication>('/applications', { method: 'POST', body: input }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['applications'] }),
   })
 }
@@ -31,8 +31,8 @@ export function useUpdateApplication()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (variables: { id: string, input: JobApplicationInput }) =>
-      request<JobApplication>(`/applications/${variables.id}`, { method: 'PUT', body: variables.input }),
+    mutationFn: (variables: { id: string, input: ApplicationTrackingInput }) =>
+      request<JobApplication>(`/applications/${variables.id}`, { method: 'PATCH', body: variables.input }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['applications'] }),
   })
 }
